@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f43f5e;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e11d48;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-card h3 {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: var(--text);
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .expense-list {
+            margin-top: 2rem;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-details {
+            flex: 1;
+        }
+
+        .expense-name {
+            font-weight: 500;
+        }
+
+        .expense-date {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .expense-amount {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .tab-container {
+            margin-bottom: 1rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background-color: var(--card);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .flex {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flex {
+                flex-direction: column;
+            }
+
+            .flex-between {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .tab-buttons {
+                width: 100%;
+            }
+
+            .tab-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .actions .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Expense Tracker</h1>
+            <p>Keep track of your expenses with ease</p>
+        </header>
+
+        <div class="card">
+            <h2>Add New Expense</h2>
+            <form id="expense-form" class="flex">
+                <div class="form-group" style="flex: 2;">
+                    <label for="expense-name">Expense Description</label>
+                    <input type="text" id="expense-name" placeholder="What did you spend on?" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="expense-amount">Amount (₹)</label>
+                    <input type="text" id="expense-amount" placeholder="0.00" required>
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button type="submit" class="btn">Add Expense</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="flex-between">
+                <h2>Dashboard</h2>
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="stats">Stats</button>
+                    <button class="tab-btn" data-tab="history">History</button>
+                    <button class="tab-btn" data-tab="chart">Chart</button>
+                </div>
+            </div>
+
+            <div id="stats-tab" class="tab-content active">
+                <div class="grid">
+                    <div class="stat-card">
+                        <h3>Today</h3>
+                        <p id="today-total">₹0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>This Week</h3>
+                        <p id="week-total">₹0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>This Month</h3>
+                        <p id="month-total">₹0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>3 Months</h3>
+                        <p id="three-month-total">₹0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>6 Months</h3>
+                        <p id="six-month-total">₹0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>12 Months</h3>
+                        <p id="year-total">₹0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <div class="expense-list" id="expense-list">
+                    <p style="text-align: center; color: var(--text-light);">No expenses yet. Add your first expense above!</p>
+                </div>
+            </div>
+
+            <div id="chart-tab" class="tab-content">
+                <div class="chart-container">
+                    <canvas id="expense-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="download-pdf" class="btn">Download Report as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Store expenses in local storage
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        
+        // DOM elements
+        const expenseForm = document.getElementById('expense-form');
+        const expenseName = document.getElementById('expense-name');
+        const expenseAmount = document.getElementById('expense-amount');
+        const expenseList = document.getElementById('expense-list');
+        const todayTotal = document.getElementById('today-total');
+        const weekTotal = document.getElementById('week-total');
+        const monthTotal = document.getElementById('month-total');
+        const threeMonthTotal = document.getElementById('three-month-total');
+        const sixMonthTotal = document.getElementById('six-month-total');
+        const yearTotal = document.getElementById('year-total');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const downloadPdfBtn = document.getElementById('download-pdf');
+        
+        // Chart.js
+        let expenseChart;
+        
+        // Initialize
+        function init() {
+            renderExpenseList();
+            updateDashboard();
+            initChart();
+            setupPdfDownload();
+        }
+        
+        // Add new expense
+        expenseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = expenseName.value.trim();
+            const amountStr = expenseAmount.value.trim().replace(/,/g, '');
+            const amount = parseFloat(amountStr);
+            
+            if (name === '' || isNaN(amount) || amount <= 0) {
+                alert('Please enter valid expense details');
+                return;
+            }
+            
+            const now = new Date();
+            
+            const expense = {
+                id: generateID(),
+                name: name,
+                amount: amount,
+                date: now.toISOString(),
+                timestamp: now.getTime()
+            };
+            
+            expenses.push(expense);
+            saveExpenses();
+            
+            expenseName.value = '';
+            expenseAmount.value = '';
+            
+            renderExpenseList();
+            updateDashboard();
+            updateChart();
+        });
+        
+        // Generate unique ID
+        function generateID() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Save expenses to local storage
+        function saveExpenses() {
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+        }
+        
+        // Format amount with Indian Rupee symbol
+        function formatAmount(amount) {
+            return '₹' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        // Render expense list
+        function renderExpenseList() {
+            if (expenses.length === 0) {
+                expenseList.innerHTML = '<p style="text-align: center; color: var(--text-light);">No expenses yet. Add your first expense above!</p>';
+                return;
+            }
+            
+            expenseList.innerHTML = '';
+            
+            // Sort expenses by date (newest first)
+            expenses.sort((a, b) => b.timestamp - a.timestamp);
+            
+            expenses.forEach(expense => {
+                const date = new Date(expense.date);
+                const formattedDate = `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}`;
+                
+                const expenseItem = document.createElement('div');
+                expenseItem.classList.add('expense-item');
+                expenseItem.innerHTML = `
+                    <div class="expense-details">
+                        <div class="expense-name">${expense.name}</div>
+                        <div class="expense-date">${formattedDate}</div>
+                    </div>
+                    <div class="expense-amount">${formatAmount(expense.amount)}</div>
+                `;
+                
+                expenseList.appendChild(expenseItem);
+            });
+        }
+        
+        // Update dashboard stats
+        function updateDashboard() {
+            const now = new Date();
+            
+            // Today
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const todayExpenses = expenses.filter(exp => exp.timestamp >= startOfDay);
+            const todaySum = todayExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // This week
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            const weekExpenses = expenses.filter(exp => exp.timestamp >= startOfWeek.getTime());
+            const weekSum = weekExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // This month
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+            const monthExpenses = expenses.filter(exp => exp.timestamp >= startOfMonth);
+            const monthSum = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // 3 months
+            const startOfThreeMonths = new Date(now);
+            startOfThreeMonths.setMonth(now.getMonth() - 3);
+            startOfThreeMonths.setHours(0, 0, 0, 0);
+            const threeMonthExpenses = expenses.filter(exp => exp.timestamp >= startOfThreeMonths.getTime());
+            const threeMonthSum = threeMonthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // 6 months
+            const startOfSixMonths = new Date(now);
+            startOfSixMonths.setMonth(now.getMonth() - 6);
+            startOfSixMonths.setHours(0, 0, 0, 0);
+            const sixMonthExpenses = expenses.filter(exp => exp.timestamp >= startOfSixMonths.getTime());
+            const sixMonthSum = sixMonthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // 12 months
+            const startOfYear = new Date(now);
+            startOfYear.setFullYear(now.getFullYear() - 1);
+            startOfYear.setHours(0, 0, 0, 0);
+            const yearExpenses = expenses.filter(exp => exp.timestamp >= startOfYear.getTime());
+            const yearSum = yearExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // Update UI
+            todayTotal.textContent = formatAmount(todaySum);
+            weekTotal.textContent = formatAmount(weekSum);
+            monthTotal.textContent = formatAmount(monthSum);
+            threeMonthTotal.textContent = formatAmount(threeMonthSum);
+            sixMonthTotal.textContent = formatAmount(sixMonthSum);
+            yearTotal.textContent = formatAmount(yearSum);
+        }
+        
+        // Initialize Chart
+        function initChart() {
+            const ctx = document.getElementById('expense-chart').getContext('2d');
+            
+            expenseChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Today', 'This Week', 'This Month', '3 Months', '6 Months', '12 Months'],
+                    datasets: [{
+                        label: 'Total Expenses',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(99, 102, 241, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(99, 102, 241, 1)',
+                            'rgba(99, 102, 241, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹' + context.raw.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            updateChart();
+        }
+        
+        // Update Chart
+        function updateChart() {
+            const now = new Date();
+            
+            // Today
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const todaySum = expenses.filter(exp => exp.timestamp >= startOfDay)
+                                    .reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // This week
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            const weekSum = expenses.filter(exp => exp.timestamp >= startOfWeek.getTime())
+                                   .reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // This month
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+            const monthSum = expenses.filter(exp => exp.timestamp >= startOfMonth)
+                                    .reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // 3 months
+            const startOfThreeMonths = new Date(now);
+            startOfThreeMonths.setMonth(now.getMonth() - 3);
+            startOfThreeMonths.setHours(0, 0, 0, 0);
+            const threeMonthSum = expenses.filter(exp => exp.timestamp >= startOfThreeMonths.getTime())
+                                         .reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // 6 months
+            const startOfSixMonths = new Date(now);
+            startOfSixMonths.setMonth(now.getMonth() - 6);
+            startOfSixMonths.setHours(0, 0, 0, 0);
+            const sixMonthSum = expenses.filter(exp => exp.timestamp >= startOfSixMonths.getTime())
+                                       .reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // 12 months
+            const startOfYear = new Date(now);
+            startOfYear.setFullYear(now.getFullYear() - 1);
+            startOfYear.setHours(0, 0, 0, 0);
+            const yearSum = expenses.filter(exp => exp.timestamp >= startOfYear.getTime())
+                                   .reduce((sum, exp) => sum + exp.amount, 0);
+            
+            // Update chart data
+            expenseChart.data.datasets[0].data = [
+                todaySum,
+                weekSum,
+                monthSum,
+                threeMonthSum,
+                sixMonthSum,
+                yearSum
+            ];
+            
+            expenseChart.update();
+        }
+        
+        // Set up PDF download functionality
+        function setupPdfDownload() {
+            downloadPdfBtn.addEventListener('click', generatePDF);
+        }
+        
+        // Generate and download PDF report
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            
+            // Create new PDF document
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            
+            // PDF styling functions
+            const centerX = pageWidth / 2;
+            
+            // Add title and date
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            
+            doc.setFontSize(22);
+            doc.setTextColor(99, 102, 241); // Primary color
+            doc.text('Expense Tracker Report', centerX, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.setTextColor(100, 116, 139); // Text light color
+            doc.text(`Generated on: ${dateStr} at ${timeStr}`, centerX, 28, { align: 'center' });
+            
+            // Add summary section
+            doc.setFontSize(16);
+            doc.setTextColor(30, 41, 59); // Text dark color
+            doc.text('Summary', 14, 40);
+            
+            doc.line(14, 42, pageWidth - 14, 42);
+            
+            const summaryData = [
+                { period: 'Today', total: todayTotal.textContent },
+                { period: 'This Week', total: weekTotal.textContent },
+                { period: 'This Month', total: monthTotal.textContent },
+                { period: '3 Months', total: threeMonthTotal.textContent },
+                { period: '6 Months', total: sixMonthTotal.textContent },
+                { period: '12 Months', total: yearTotal.textContent }
+            ];
+            
+            let yPos = 50;
+            doc.setFontSize(12);
+            
+            summaryData.forEach((item, index) => {
+                doc.setTextColor(30, 41, 59); // Text dark color
+                doc.text(item.period, 20, yPos);
+                
+                doc.setTextColor(244, 63, 94); // Secondary color for amount
+                doc.text(item.total, pageWidth - 20, yPos, { align: 'right' });
+                
+                yPos += 8;
+            });
+            
+            // Add recent expenses section
+            yPos += 8;
+            doc.setFontSize(16);
+            doc.setTextColor(30, 41, 59); // Text dark color
+            doc.text('Recent Expenses', 14, yPos);
+            
+            yPos += 2;
+            doc.line(14, yPos, pageWidth - 14, yPos);
+            
+            yPos += 8;
+            
+            // Headers for expense list
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Description', 18, yPos);
+            doc.text('Date', 80, yPos);
+            doc.text('Amount', pageWidth - 20, yPos, { align: 'right' });
+            
+            yPos += 5;
+            doc.line(14, yPos, pageWidth - 14, yPos);
+            yPos += 5;
+            
+            // Recent expenses (top 15)
+            const recentExpenses = [...expenses]
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .slice(0, 15);
+                
+            doc.setFont(undefined, 'normal');
+            
+            recentExpenses.forEach((expense, index) => {
+                // Check if we need a new page
+                if (yPos > pageHeight - 20) {
+                    doc.addPage();
+                    yPos = 20;
+                    
+                    // Add headers on new page
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Description', 18, yPos);
+                    doc.text('Date', 80, yPos);
+                    doc.text('Amount', pageWidth - 20, yPos, { align: 'right' });
+                    
+                    yPos += 5;
+                    doc.line(14, yPos, pageWidth - 14, yPos);
+                    yPos += 5;
+                    
+                    doc.setFont(undefined, 'normal');
+                }
+                
+                const date = new Date(expense.date);
+                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                
+                // Limit description length for PDF
+                let description = expense.name;
+                if (description.length > 25) {
+                    description = description.substring(0, 22) + '...';
+                }
+                
+                doc.setTextColor(30, 41, 59); // Text dark color
+                doc.text(description, 18, yPos);
+                doc.text(formattedDate, 80, yPos);
+                
+                doc.setTextColor(244, 63, 94); // Secondary color for amount
+                doc.text(formatAmount(expense.amount), pageWidth - 20, yPos, { align: 'right' });
+                
+                yPos += 7;
+                
+                // Add a light separator line between entries
+                if (index < recentExpenses.length - 1) {
+                    doc.setDrawColor(226, 232, 240); // Light border color
+                    doc.line(18, yPos - 3.5, pageWidth - 18, yPos - 3.5);
+                }
+            });
+            
+            // Add footer
+            const footerY = pageHeight - 10;
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // Text light color
+            doc.text('Expense Tracker - Personal Finance Manager', centerX, footerY, { align: 'center' });
+            
+            // Save the PDF
+            doc.save('Expense_Report.pdf');
+        }
+        
+        // Tab switching
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Update active button
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update active content
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Refresh chart if needed
+                if (tabId === 'chart') {
+                    expenseChart.resize();
+                }
+            });
+        });
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
